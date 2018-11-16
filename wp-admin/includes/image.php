@@ -160,6 +160,13 @@ function wp_generate_attachment_metadata( $attachment_id, $file ) {
 		$metadata = wp_read_audio_metadata( $file );
 		$support  = current_theme_supports( 'post-thumbnails', 'attachment:audio' ) || post_type_supports( 'attachment:audio', 'thumbnail' );
 	}
+	
+	/**
+	 * Filters the mime types that have support for thumbnail generation
+	 *
+	 * @param array $other_supported_mime_types  An array of supported MIME types
+	 */
+	$other_supported_mime_types = apply_filters( 'mime_types_thumbnail_generation', array( 'application/pdf' ) );
 
 	if ( $support && ! empty( $metadata['image']['data'] ) ) {
 		// Check for existing cover.
@@ -216,7 +223,7 @@ function wp_generate_attachment_metadata( $attachment_id, $file ) {
 			}
 		}
 	} // Try to create image thumbnails for PDFs
-	elseif ( 'application/pdf' === $mime_type ) {
+	elseif ( in_array( $mime_type, $other_supported_mime_types, true ) ) {
 		$fallback_sizes = array(
 			'thumbnail',
 			'medium',
